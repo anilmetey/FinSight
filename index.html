@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinSight — Finans ve Bütçe Yönetim Paneli</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css?v=21" />
+  </head>
+  <body class="splash-active">
+    <div class="ambient-bg" aria-hidden="true">
+      <div class="ambient-orb orb-a"></div>
+      <div class="ambient-orb orb-b"></div>
+      <div class="ambient-orb orb-c"></div>
+      <div class="ambient-mesh"></div>
+      <div class="ambient-noise"></div>
+    </div>
+
+    <!-- Onboarding / Splash -->
+    <section id="splashScreen" class="splash-screen" aria-label="FinSight açılış ekranı">
+      <div class="splash-orbit orbit-one"></div>
+      <div class="splash-orbit orbit-two"></div>
+      <div class="splash-card">
+        <div class="onboarding-steps">
+          <div class="onboarding-step is-active" data-step="0">
+            <div class="splash-brand">
+              <span class="brand-mark splash-mark"><i data-lucide="landmark"></i></span>
+              <div>
+                <strong>FinSight</strong>
+                <small>Premium Finans Paneli v2</small>
+              </div>
+            </div>
+            <div class="splash-copy">
+              <p class="eyebrow">Hoş geldiniz</p>
+              <h1>Finansal kontrol merkeziniz hazır.</h1>
+              <p>Gelir, gider, bütçe, hedefler ve hesaplarınızı tek panelde yönetin. Tüm veriler cihazınızda güvenle saklanır.</p>
+            </div>
+          </div>
+          <div class="onboarding-step" data-step="1">
+            <div class="splash-copy">
+              <p class="eyebrow">Özellikler</p>
+              <h1>Akıllı analiz ve planlama.</h1>
+              <ul class="onboarding-list">
+                <li><i data-lucide="gauge"></i>Finansal sağlık skoru ve bütçe danışmanı</li>
+                <li><i data-lucide="target"></i>Özelleştirilebilir hedefler ve tekrarlayan işlemler</li>
+                <li><i data-lucide="wallet"></i>Çoklu hesap takibi ve net değer özeti</li>
+              </ul>
+            </div>
+          </div>
+          <div class="onboarding-step" data-step="2">
+            <div class="splash-copy">
+              <p class="eyebrow">Başlangıç</p>
+              <h1>Hemen başlayın.</h1>
+              <p>İşlem ekleyerek veya örnek veri yükleyerek paneli keşfedin. Ctrl+N ile hızlı işlem ekleyebilirsiniz.</p>
+              <div class="onboarding-actions">
+                <button id="onboardingSampleBtn" class="secondary-button" type="button">
+                  <i data-lucide="database"></i>Örnek veri yükle
+                </button>
+                <button id="onboardingStartBtn" class="primary-button" type="button">
+                  <i data-lucide="arrow-right"></i>Panele geç
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="onboarding-dots" aria-hidden="true">
+          <span class="is-active"></span><span></span><span></span>
+        </div>
+        <div class="splash-progress" aria-hidden="true"><span></span></div>
+        <div class="splash-footer">
+          <span><i data-lucide="lock-keyhole"></i>Yerel veri · Anlık analiz · CSV/JSON yedek</span>
+          <button id="skipSplashBtn" class="ghost-button" type="button">Atla</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="app-layout">
+      <!-- Sidebar -->
+      <aside id="sidebar" class="sidebar is-open" aria-label="Ana navigasyon">
+        <div class="sidebar-brand">
+          <span class="brand-mark"><i data-lucide="landmark"></i></span>
+          <div class="sidebar-brand-text">
+            <strong>FinSight</strong>
+            <small>Finance v2</small>
+          </div>
+          <button id="sidebarCloseBtn" class="icon-button sidebar-close" type="button" aria-label="Menüyü kapat">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <nav class="sidebar-nav">
+          <button class="nav-item is-active" data-view="overview" type="button">
+            <i data-lucide="layout-dashboard"></i><span>Genel Bakış</span>
+          </button>
+          <button class="nav-item" data-view="transactions" type="button">
+            <i data-lucide="arrow-left-right"></i><span>İşlemler</span>
+          </button>
+          <button class="nav-item" data-view="analytics" type="button">
+            <i data-lucide="bar-chart-3"></i><span>Analitik</span>
+          </button>
+          <button class="nav-item" data-view="planning" type="button">
+            <i data-lucide="calendar-check"></i><span>Planlama</span>
+          </button>
+          <button class="nav-item" data-view="settings" type="button">
+            <i data-lucide="settings"></i><span>Ayarlar</span>
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="health-mini">
+            <span>Finansal skor</span>
+            <strong id="sidebarHealthScore">—</strong>
+          </div>
+        </div>
+      </aside>
+      <div id="sidebarOverlay" class="sidebar-overlay" hidden></div>
+
+      <!-- Main -->
+      <div class="main-area">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button id="sidebarToggleBtn" class="icon-button" type="button" aria-label="Menüyü aç">
+              <i data-lucide="menu"></i>
+            </button>
+            <div class="topbar-title">
+              <h1 id="viewTitle">Genel Bakış</h1>
+              <p id="viewSubtitle">Finansal durumunuzun özeti</p>
+            </div>
+          </div>
+          <div class="topbar-right">
+            <button id="themeToggleBtn" class="icon-button" type="button" aria-label="Tema değiştir">
+              <i data-lucide="sun" class="theme-icon-light"></i>
+              <i data-lucide="moon" class="theme-icon-dark hidden"></i>
+            </button>
+            <button id="quickAddBtn" class="primary-button compact-button" type="button">
+              <i data-lucide="plus"></i><span class="hide-mobile">Yeni işlem</span>
+            </button>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <!-- OVERVIEW -->
+          <section id="viewOverview" class="view-panel is-active" data-view="overview">
+            <div class="hero-metrics" data-reveal>
+              <article class="metric-card hero-metric positive">
+                <div class="metric-header">
+                  <span class="metric-label"><i data-lucide="trending-up"></i>Toplam gelir</span>
+                  <span id="incomeTrend" class="trend-badge">—</span>
+                </div>
+                <strong id="incomeTotal">₺0</strong>
+                <small id="incomeShare">Hacim payı %0</small>
+                <canvas class="sparkline" id="incomeSparkline" height="32" aria-hidden="true"></canvas>
+              </article>
+              <article class="metric-card hero-metric negative">
+                <div class="metric-header">
+                  <span class="metric-label"><i data-lucide="trending-down"></i>Toplam gider</span>
+                  <span id="expenseTrend" class="trend-badge">—</span>
+                </div>
+                <strong id="expenseTotal">₺0</strong>
+                <small id="expenseShare">Hacim payı %0</small>
+                <canvas class="sparkline" id="expenseSparkline" height="32" aria-hidden="true"></canvas>
+              </article>
+              <article class="metric-card hero-metric">
+                <div class="metric-header">
+                  <span class="metric-label"><i data-lucide="wallet"></i>Net bakiye</span>
+                  <span id="balanceTrend" class="trend-badge">—</span>
+                </div>
+                <strong id="balanceTotal">₺0</strong>
+                <small id="balanceStatus">Denge bekleniyor</small>
+              </article>
+              <article class="metric-card hero-metric">
+                <div class="metric-header">
+                  <span class="metric-label"><i data-lucide="piggy-bank"></i>Tasarruf oranı</span>
+                </div>
+                <strong id="savingRate">%0</strong>
+                <small id="savingStatus">Veri bekleniyor</small>
+              </article>
+            </div>
+
+            <div class="widget-grid" data-reveal>
+              <article class="widget-card">
+                <header><i data-lucide="git-compare"></i><span>Ay karşılaştırması</span></header>
+                <div id="momComparison" class="widget-body"></div>
+              </article>
+              <article class="widget-card">
+                <header><i data-lucide="flame"></i><span>Tasarruf serisi</span></header>
+                <div id="savingsStreak" class="widget-body streak-body">
+                  <strong id="streakCount">0</strong>
+                  <span>gün pozitif nakit akışı</span>
+                </div>
+              </article>
+              <article class="widget-card">
+                <header><i data-lucide="layers"></i><span>En çok harcanan</span></header>
+                <ul id="topCategoriesWidget" class="widget-list"></ul>
+              </article>
+              <article class="widget-card">
+                <header><i data-lucide="landmark"></i><span>Net değer</span></header>
+                <div id="netWorthWidget" class="widget-body">
+                  <strong id="netWorthTotal">₺0</strong>
+                  <span id="netWorthDetail">Hesap bakiyeleri + net nakit</span>
+                </div>
+              </article>
+            </div>
+
+            <div class="overview-strip" data-reveal aria-label="Hızlı özet">
+              <article><i data-lucide="receipt"></i><span>Toplam işlem</span><strong id="accountSummary">Veri girin</strong></article>
+              <article><i data-lucide="calendar-clock"></i><span>Yaklaşan ödeme</span><strong id="nextPayment">-</strong></article>
+              <article><i data-lucide="flag"></i><span>Hedef ilerlemesi</span><strong id="goalSummary">-</strong></article>
+              <article><i data-lucide="line-chart"></i><span>Dönem trendi</span><strong id="periodTrend">-</strong></article>
+            </div>
+
+            <div class="quick-filters" data-reveal>
+              <label>Hızlı aralık<select id="datePreset">
+                <option value="all">Tüm veri</option>
+                <option value="thisMonth">Bu ay</option>
+                <option value="last30">Son 30 gün</option>
+                <option value="quarter">Son çeyrek</option>
+              </select></label>
+              <label>Başlangıç<input id="startDate" type="date" /></label>
+              <label>Bitiş<input id="endDate" type="date" /></label>
+            </div>
+          </section>
+
+          <!-- TRANSACTIONS -->
+          <section id="viewTransactions" class="view-panel" data-view="transactions" hidden>
+            <div class="transactions-layout" data-reveal>
+              <aside class="entry-panel">
+                <div class="section-heading">
+                  <p class="eyebrow">Operasyon</p>
+                  <h2><i data-lucide="plus-circle"></i>İşlem kaydı</h2>
+                </div>
+                <form id="transactionForm" class="transaction-form">
+                  <div class="form-field"><label for="type">İşlem türü</label><select id="type" required>
+                    <option value="income">Gelir</option><option value="expense">Gider</option>
+                  </select></div>
+                  <div class="form-field"><label for="category">Kategori</label><select id="category" required></select></div>
+                  <div id="customCategoryWrap" class="form-field custom-category-wrap hidden">
+                    <label for="customCategory">Özel kategori</label><input id="customCategory" type="text" maxlength="24" placeholder="Kategori adı" />
+                  </div>
+                  <div class="form-field"><label for="amount">Tutar</label><input id="amount" type="number" min="1" step="0.01" placeholder="1250" required /></div>
+                  <div class="form-field"><label for="date">Tarih</label><input id="date" type="date" required /></div>
+                  <div class="form-field"><label for="note">Not / Etiket</label><input id="note" type="text" maxlength="48" placeholder="#market alışverişi" /></div>
+                  <div class="form-field"><label for="accountSelect">Hesap</label><select id="accountSelect"></select></div>
+                  <button class="primary-button full-button" type="submit"><i data-lucide="save"></i>İşlemi kaydet</button>
+                </form>
+                <div class="divider"></div>
+                <div class="section-heading compact">
+                  <p class="eyebrow">Kontrol</p>
+                  <h2><i data-lucide="target"></i>Kategori limiti</h2>
+                </div>
+                <form id="budgetForm" class="transaction-form">
+                  <div class="form-field"><label for="budgetCategory">Gider kategorisi</label><select id="budgetCategory" required></select></div>
+                  <div class="form-field"><label for="budgetAmount">Aylık limit</label><input id="budgetAmount" type="number" min="1" step="0.01" placeholder="8000" required /></div>
+                  <button class="secondary-button full-button" type="submit"><i data-lucide="badge-check"></i>Limiti kaydet</button>
+                </form>
+              </aside>
+              <div class="transactions-main">
+                <div class="filters-bar">
+                  <label>Tür<select id="typeFilter">
+                    <option value="all">Tümü</option><option value="income">Gelir</option><option value="expense">Gider</option>
+                  </select></label>
+                  <label>Kategori<select id="categoryFilter"><option value="all">Tüm kategoriler</option></select></label>
+                  <label class="search-field grow"><span>Ara</span><input id="searchInput" type="search" placeholder="Kategori, not veya tutar" /></label>
+                </div>
+                <article class="report-panel" data-reveal>
+                  <div class="report-header">
+                    <div class="panel-title"><h2><i data-lucide="table-2"></i>İşlem listesi</h2><span id="reportCount">0 kayıt</span></div>
+                  </div>
+                  <div class="report-insights">
+                    <article><span>En büyük gider</span><strong id="topExpense">-</strong></article>
+                    <article><span>En aktif kategori</span><strong id="topCategory">-</strong></article>
+                    <article><span>Ortalama işlem</span><strong id="averageTransaction">₺0</strong></article>
+                    <article><span>Son işlem</span><strong id="latestTransaction">-</strong></article>
+                  </div>
+                  <div class="table-wrap">
+                    <table>
+                      <thead><tr><th>Tarih</th><th>Tür</th><th>Kategori</th><th>Not</th><th>Hesap</th><th>Tutar</th><th></th></tr></thead>
+                      <tbody id="transactionRows"></tbody>
+                    </table>
+                    <p id="emptyState" class="empty-state">Seçili filtrelerde gösterilecek kayıt yok.</p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </section>
+
+          <!-- ANALYTICS -->
+          <section id="viewAnalytics" class="view-panel" data-view="analytics" hidden>
+            <div class="filters-bar" data-reveal>
+              <label>Dönem<select id="periodFilter">
+                <option value="monthly">Aylık</option><option value="weekly">Haftalık</option>
+              </select></label>
+            </div>
+            <div class="analysis-grid" data-reveal>
+              <article class="analysis-panel">
+                <div class="panel-title"><h2><i data-lucide="gauge"></i>Bütçe kullanımı</h2><span id="budgetSummary">0 limit</span></div>
+                <div class="budget-basis">
+                  <strong id="budgetBasisTitle">Bütçe modeli hazırlanıyor</strong>
+                  <span id="budgetBasisText">Gelir, geçmiş harcama dağılımı ve manuel limitler birlikte değerlendiriliyor.</span>
+                </div>
+                <div id="budgetRings" class="budget-rings"></div>
+                <div id="budgetRows" class="budget-list"></div>
+              </article>
+              <article class="analysis-panel">
+                <div class="panel-title">
+                  <h2><i data-lucide="sparkles"></i>Finansal sağlık</h2>
+                  <button id="healthExpandBtn" class="chip-button" type="button"><span id="healthScore">Skor: 0/100</span><i data-lucide="chevron-down"></i></button>
+                </div>
+                <div id="healthBreakdown" class="health-breakdown hidden"></div>
+                <ul id="advisorList" class="advisor-list"></ul>
+              </article>
+            </div>
+            <div class="chart-grid" data-reveal>
+              <article class="chart-panel">
+                <div class="panel-title"><h2><i data-lucide="pie-chart"></i>Kategori dağılımı</h2><span id="pieHint">Gider kategorileri</span></div>
+                <div class="pie-wrap">
+                  <canvas id="categoryPie" width="320" height="320" aria-label="Kategori dağılım grafiği"></canvas>
+                  <ul id="categoryLegend" class="legend"></ul>
+                </div>
+                <div class="chart-insight">
+                  <strong id="categoryInsight">Kategori verisi hazırlanıyor</strong>
+                  <span id="categoryInsightText">Filtreye göre gider veya gelir kırılımı analiz edilir.</span>
+                </div>
+              </article>
+              <article class="chart-panel">
+                <div class="panel-title"><h2><i data-lucide="activity"></i>Nakit akışı</h2><span id="lineHint">Aylık görünüm</span></div>
+                <canvas id="cashflowLine" width="720" height="340" aria-label="Nakit akışı çizgi grafiği"></canvas>
+                <div class="chart-insight compact">
+                  <strong id="cashflowInsight">Nakit akışı hazırlanıyor</strong>
+                  <span id="cashflowInsightText">Gelir, gider ve net bakiye dönem bazlı karşılaştırılır.</span>
+                </div>
+              </article>
+            </div>
+            <article class="chart-panel weekly-panel" data-reveal>
+              <div class="panel-title"><h2><i data-lucide="calendar-range"></i>Haftalık harcama</h2><span id="weeklyHint">Son 8 hafta</span></div>
+              <canvas id="weeklyHeatmap" width="720" height="200" aria-label="Haftalık harcama grafiği"></canvas>
+            </article>
+          </section>
+
+          <!-- PLANNING -->
+          <section id="viewPlanning" class="view-panel" data-view="planning" hidden>
+            <div class="planning-grid" data-reveal>
+              <article class="planning-panel">
+                <div class="panel-title">
+                  <h2><i data-lucide="flag"></i>Finansal hedefler</h2>
+                  <button id="addGoalBtn" class="chip-button" type="button"><i data-lucide="plus"></i>Hedef ekle</button>
+                </div>
+                <div id="goalRows" class="goal-list"></div>
+              </article>
+              <article class="planning-panel">
+                <div class="panel-title">
+                  <h2><i data-lucide="repeat"></i>Tekrarlayan işlemler</h2>
+                  <button id="addRecurringBtn" class="chip-button" type="button"><i data-lucide="plus"></i>Ekle</button>
+                </div>
+                <div id="recurringRows" class="recurring-list"></div>
+              </article>
+            </div>
+            <div class="planning-grid" data-reveal>
+              <article class="planning-panel">
+                <div class="panel-title"><h2><i data-lucide="calendar-days"></i>Yaklaşan işlemler</h2><span id="upcomingCount">0 işlem</span></div>
+                <div id="upcomingRows" class="upcoming-list"></div>
+              </article>
+              <article class="planning-panel">
+                <div class="panel-title">
+                  <h2><i data-lucide="wallet"></i>Hesaplar</h2>
+                  <button id="addAccountBtn" class="chip-button" type="button"><i data-lucide="plus"></i>Hesap ekle</button>
+                </div>
+                <div id="accountRows" class="account-list"></div>
+              </article>
+            </div>
+          </section>
+
+          <!-- SETTINGS -->
+          <section id="viewSettings" class="view-panel" data-view="settings" hidden>
+            <div class="settings-grid" data-reveal>
+              <article class="settings-panel">
+                <h2><i data-lucide="palette"></i>Görünüm</h2>
+                <div class="settings-group">
+                  <label>Tema<select id="themeSetting">
+                    <option value="light">Açık</option><option value="dark">Koyu</option><option value="system">Sistem</option>
+                  </select></label>
+                  <label>Para birimi<select id="currencySetting">
+                    <option value="TRY">₺ TRY</option><option value="USD">$ USD</option><option value="EUR">€ EUR</option>
+                  </select></label>
+                  <label>Tarih formatı<select id="dateFormatSetting">
+                    <option value="tr-TR">GG.AA.YYYY (TR)</option><option value="en-US">MM/DD/YYYY (US)</option>
+                  </select></label>
+                </div>
+              </article>
+              <article class="settings-panel">
+                <h2><i data-lucide="tags"></i>Kategori yönetimi</h2>
+                <div id="categoryManager" class="category-manager"></div>
+              </article>
+              <article class="settings-panel">
+                <h2><i data-lucide="database"></i>Veri yönetimi</h2>
+                <div class="settings-actions">
+                  <button id="exportBtn" class="primary-button" type="button"><i data-lucide="download"></i>CSV indir</button>
+                  <button id="exportJsonBtn" class="secondary-button" type="button"><i data-lucide="file-json"></i>JSON yedek</button>
+                  <button id="importBtn" class="secondary-button" type="button"><i data-lucide="upload"></i>Yedek yükle</button>
+                  <input id="importFile" type="file" accept=".json,application/json" hidden />
+                  <button id="loadSampleBtn" class="secondary-button" type="button"><i data-lucide="database"></i>Örnek veri</button>
+                  <button id="clearBtn" class="ghost-button danger-text" type="button"><i data-lucide="trash-2"></i>Tümünü temizle</button>
+                </div>
+              </article>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- FAB -->
+    <button id="fabBtn" class="fab" type="button" aria-label="Hızlı işlem ekle"><i data-lucide="plus"></i></button>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+    <dialog id="confirmDialog" class="app-dialog confirm-dialog">
+      <div class="dialog-body">
+        <h2 id="confirmTitle"><i data-lucide="alert-triangle"></i>Onay gerekli</h2>
+        <p id="confirmMessage"></p>
+        <p id="confirmDetail" class="dialog-detail"></p>
+      </div>
+      <div class="dialog-actions">
+        <button id="confirmCancel" class="ghost-button" type="button">Vazgeç</button>
+        <button id="confirmOk" class="primary-button danger-button" type="button">Onayla</button>
+      </div>
+    </dialog>
+
+    <dialog id="editModal" class="app-dialog edit-dialog">
+      <form id="editForm" class="transaction-form">
+        <div class="dialog-body">
+          <h2><i data-lucide="pencil"></i>İşlemi düzenle</h2>
+          <div class="form-field"><label for="editType">İşlem türü</label><select id="editType" required>
+            <option value="income">Gelir</option><option value="expense">Gider</option>
+          </select></div>
+          <div class="form-field"><label for="editCategory">Kategori</label><select id="editCategory" required></select></div>
+          <div id="editCustomCategoryWrap" class="form-field custom-category-wrap hidden">
+            <label for="editCustomCategory">Özel kategori</label><input id="editCustomCategory" type="text" maxlength="24" />
+          </div>
+          <div class="form-field"><label for="editAmount">Tutar</label><input id="editAmount" type="number" min="0.01" step="0.01" required /></div>
+          <div class="form-field"><label for="editDate">Tarih</label><input id="editDate" type="date" required /></div>
+          <div class="form-field"><label for="editNote">Not</label><input id="editNote" type="text" maxlength="48" /></div>
+          <div class="form-field"><label for="editAccount">Hesap</label><select id="editAccount"></select></div>
+        </div>
+        <div class="dialog-actions">
+          <button id="editCancel" class="ghost-button" type="button">Vazgeç</button>
+          <button class="primary-button" type="submit"><i data-lucide="save"></i>Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="quickAddModal" class="app-dialog">
+      <form id="quickAddForm" class="transaction-form">
+        <div class="dialog-body">
+          <h2><i data-lucide="zap"></i>Hızlı işlem</h2>
+          <p class="dialog-hint">Kısayol: <kbd>Ctrl</kbd> + <kbd>N</kbd></p>
+          <div class="form-row">
+            <div class="form-field"><label for="quickType">Tür</label><select id="quickType"><option value="expense">Gider</option><option value="income">Gelir</option></select></div>
+            <div class="form-field"><label for="quickAmount">Tutar</label><input id="quickAmount" type="number" min="1" step="0.01" required /></div>
+          </div>
+          <div class="form-field"><label for="quickCategory">Kategori</label><select id="quickCategory"></select></div>
+          <div class="form-field"><label for="quickNote">Not</label><input id="quickNote" type="text" maxlength="48" placeholder="Kısa not" /></div>
+        </div>
+        <div class="dialog-actions">
+          <button id="quickAddCancel" class="ghost-button" type="button">Vazgeç</button>
+          <button class="primary-button" type="submit"><i data-lucide="save"></i>Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="goalModal" class="app-dialog">
+      <form id="goalForm" class="transaction-form">
+        <div class="dialog-body">
+          <h2 id="goalModalTitle"><i data-lucide="flag"></i>Hedef ekle</h2>
+          <div class="form-field"><label for="goalName">Hedef adı</label><input id="goalName" type="text" maxlength="32" required placeholder="Acil fon" /></div>
+          <div class="form-field"><label for="goalTarget">Hedef tutar</label><input id="goalTarget" type="number" min="1" step="0.01" required /></div>
+          <div class="form-field"><label for="goalCurrent">Mevcut birikim</label><input id="goalCurrent" type="number" min="0" step="0.01" value="0" /></div>
+          <div class="form-field"><label for="goalDeadline">Son tarih</label><input id="goalDeadline" type="date" required /></div>
+        </div>
+        <div class="dialog-actions">
+          <button id="goalCancel" class="ghost-button" type="button">Vazgeç</button>
+          <button class="primary-button" type="submit"><i data-lucide="save"></i>Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="accountModal" class="app-dialog">
+      <form id="accountForm" class="transaction-form">
+        <div class="dialog-body">
+          <h2 id="accountModalTitle"><i data-lucide="wallet"></i>Hesap ekle</h2>
+          <div class="form-field"><label for="accountName">Hesap adı</label><input id="accountName" type="text" maxlength="24" required placeholder="Vadesiz TL" /></div>
+          <div class="form-field"><label for="accountBalance">Başlangıç bakiyesi</label><input id="accountBalance" type="number" step="0.01" value="0" /></div>
+          <div class="form-field"><label for="accountType">Tür</label><select id="accountType">
+            <option value="bank">Banka</option><option value="cash">Nakit</option><option value="investment">Yatırım</option><option value="credit">Kredi</option>
+          </select></div>
+        </div>
+        <div class="dialog-actions">
+          <button id="accountCancel" class="ghost-button" type="button">Vazgeç</button>
+          <button class="primary-button" type="submit"><i data-lucide="save"></i>Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="recurringModal" class="app-dialog">
+      <form id="recurringForm" class="transaction-form">
+        <div class="dialog-body">
+          <h2><i data-lucide="repeat"></i>Tekrarlayan işlem</h2>
+          <div class="form-field"><label for="recurringType">Tür</label><select id="recurringType"><option value="expense">Gider</option><option value="income">Gelir</option></select></div>
+          <div class="form-field"><label for="recurringCategory">Kategori</label><select id="recurringCategory"></select></div>
+          <div class="form-field"><label for="recurringAmount">Tutar</label><input id="recurringAmount" type="number" min="1" step="0.01" required /></div>
+          <div class="form-field"><label for="recurringFrequency">Sıklık</label><select id="recurringFrequency"><option value="weekly">Haftalık</option><option value="monthly">Aylık</option></select></div>
+          <div class="form-field"><label for="recurringNextDate">Sonraki tarih</label><input id="recurringNextDate" type="date" required /></div>
+          <div class="form-field"><label for="recurringNote">Not</label><input id="recurringNote" type="text" maxlength="48" /></div>
+        </div>
+        <div class="dialog-actions">
+          <button id="recurringCancel" class="ghost-button" type="button">Vazgeç</button>
+          <button class="primary-button" type="submit"><i data-lucide="save"></i>Kaydet</button>
+        </div>
+      </form>
+    </dialog>
+
+    <span id="heroHealth" hidden aria-hidden="true"></span>
+    <span id="goalCount" hidden aria-hidden="true"></span>
+
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="app.js?v=21"></script>
+  </body>
+</html>
